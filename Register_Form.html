@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Validation with AJAX</title>
+    <style>
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+
+    <h2>Register Form</h2>
+
+    <form id="registerForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" required>
+        <span id="usernameError" class="error"></span>
+        <br><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        <span id="passwordError" class="error"></span>
+        <br><br>
+
+        <input type="submit" value="Register">
+        <span id="formSuccess" class="success"></span>
+    </form>
+
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clearMessages = () => {
+                document.getElementById('usernameError').textContent = '';
+                document.getElementById('passwordError').textContent = '';
+                document.getElementById('formSuccess').textContent = '';
+            };
+            clearMessages();
+
+            fetch('validate_form.php', {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('formSuccess').textContent = 'Form submitted successfully!';
+                } else {
+                    document.getElementById('usernameError').textContent = data.errors.username || '';
+                    document.getElementById('passwordError').textContent = data.errors.password || '';
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+</body>
+</html>
